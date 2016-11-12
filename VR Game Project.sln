@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2008
+
+Project("{C153B284-EBD7-19F2-B61E-7FE5D0753498}") = "VR Game Project", "Assembly-CSharp.csproj", "{87B98E68-319D-9AE9-FDC1-05A2518BDEB8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87B98E68-319D-9AE9-FDC1-05A2518BDEB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87B98E68-319D-9AE9-FDC1-05A2518BDEB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87B98E68-319D-9AE9-FDC1-05A2518BDEB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87B98E68-319D-9AE9-FDC1-05A2518BDEB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
