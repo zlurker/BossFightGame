@@ -11,6 +11,7 @@ public class Unit : UnitBase {
         public float healthRegen;
     }
 
+    public bool bossStatus;
     public Transform target;
     [Header("Unit Behavior")]
     public UnitPhases[] phases;
@@ -31,6 +32,10 @@ public class Unit : UnitBase {
                 tempTarget = target;
 
             attacks[i].timer = FireWeapon(attacks[i], tempTarget);
+        }
+
+        for (var i = 0; i < abilities.Length; i++) {
+            abilities[i].timer = UseAbility(abilities[i]);
         }
     }
 }

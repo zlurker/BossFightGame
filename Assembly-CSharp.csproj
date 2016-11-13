@@ -6,7 +6,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{87B98E68-319D-9AE9-FDC1-05A2518BDEB8}</ProjectGuid>
+    <ProjectGuid>{BE9DD818-BA5A-E3B5-E7A5-8A9F1051E290}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\ExperimentalScripts\ListExperimentScript.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\NormalizeTest.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\ObjectPullingExperiment.cs" />
      <Compile Include="Assets\Scripts\GameDirector.cs" />
@@ -52,6 +53,11 @@
      <Compile Include="Assets\Scripts\Projectile.cs" />
      <Compile Include="Assets\Scripts\Unit.cs" />
      <Compile Include="Assets\Scripts\UnitBase.cs" />
+     <None Include="Assets\ImportedAssets\Simple Town\Changelog.txt" />
+     <None Include="Assets\ImportedAssets\Simple Sky\ReadMe.txt" />
+     <None Include="Assets\ImportedAssets\Simple Military\ReadMe.txt" />
+     <None Include="Assets\ImportedAssets\Simple Military\Materials\UnlitVertexColour_Alpha.shader" />
+     <None Include="Assets\ImportedAssets\Credits.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity 5.4.1/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

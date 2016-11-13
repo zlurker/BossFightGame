@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Projectile : MonoBehaviour {
     [System.Serializable]
@@ -16,17 +17,20 @@ public class Projectile : MonoBehaviour {
     public bool timeBasedProjectile;
     public float lifetime;
     public bool piercing;
+    public bool healing;
 
     [Header("Seeking Attributes")]
     public float rateOfTargetUpdate;
 
     [Header("Other Attributes")]
     public Vector3 rotation;
+    public Vector3 expand;
     public bool warnPlayer;
 
     [Header("On Projectile Hit")]
     public float aoeSize;
     public bool stops;
+    public UnitBase.UnitStats statusEffectCaused;
 
     [Header("On Projectile Expiry")]
     public GameObject[] spawns;
@@ -39,13 +43,15 @@ public class Projectile : MonoBehaviour {
     public float targetUpdateTimer;
     [HideInInspector]
     public Transform spawner;
-    [HideInInspector]
+    //[HideInInspector]
     public string affectsTag;
     [HideInInspector]
     public bool contact;
 
     void Start() {
         lifetime += Time.time;
+        if (healing)
+            damage *= -1;
     }
 
     void Update() {
@@ -75,6 +81,9 @@ public class Projectile : MonoBehaviour {
         if (rotation != Vector3.zero)
             transform.eulerAngles += rotation;
 
+        if (expand != Vector3.zero)
+            transform.localScale += expand;
+
         if (warnPlayer) { //Show marking.
 
         }
@@ -85,21 +94,43 @@ public class Projectile : MonoBehaviour {
     }
 
     void OnCollisionEnter(Collision collision) {
+        UnitBase inst = null;
+        UnitBase.UnitStats temp;
         if (collision.transform.CompareTag(affectsTag) || collision.transform.CompareTag("Floor")) {
             contact = true;
+
+            if (collision.transform.CompareTag(affectsTag)) {
+                inst = collision.transform.GetComponent<UnitBase>();
+            }
+
             if (aoeSize > 0) {
                 Collider[] inAoe;
                 inAoe = Physics.OverlapSphere(collision.transform.position, aoeSize);
 
                 foreach (Collider caughtInAoe in inAoe)
-                    if (caughtInAoe.transform.CompareTag(affectsTag))
-                        caughtInAoe.transform.GetComponent<UnitBase>().health -= damage;
-            } else
-                if (collision.transform.CompareTag(affectsTag))
-                collision.transform.GetComponent<UnitBase>().health -= damage;
+                    if (inst) {
+                        inst.DamageUnit(damage);
+                        if (statusEffectCaused.stats.Length > 0) {
+                            temp = statusEffectCaused;
+                            temp.lifetime += Time.time;
 
-            if (!piercing) 
-                ProjectileExpired();            
+                            inst.unitStat.Add(temp);                           
+                        }
+                    }
+            } else {
+                if (inst) {
+                    inst.DamageUnit(damage);
+                    if (statusEffectCaused.stats.Length > 0) {
+                        temp = statusEffectCaused;
+                        temp.lifetime += Time.time;
+
+                        inst.unitStat.Add(temp);                     
+                    }
+                }
+            }
+
+            if (!piercing)
+                ProjectileExpired();
         }
     }
 

@@ -1,7 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UnitBase : MonoBehaviour {
+
+    public enum ModifierValueType {
+        Value, Percentage
+    }
 
     public enum AttackType {
         InFrontOfUnit, GlobalRandomLocations
@@ -16,25 +21,41 @@ public class UnitBase : MonoBehaviour {
     }
 
     public enum AbilityType {
-        Stats, Environment
+        StatsBuff, Environment
     }
 
-    public enum StatsAffectType {
-        TargetSelf, TargetSingle, TargetGroup
+    [System.Serializable]
+    public struct Stat {
+        public string statName;
+        public float statValue;
+        public bool negativeAllowed;
+    }
+
+    [System.Serializable]
+    public struct UnitStats {
+        public ModifierValueType valueModifierType;
+        public bool timed;
+        public float lifetime;
+        public Stat[] stats;
+        //5 stats - 1: DamageMod
+        //2: ArmorMod
+        //3: MovespeedMod
+        //4: AttackSpeedMod
+        //5: LifeRegnMod
     }
 
     [System.Serializable]
     public struct UnitAttacks {
-        public string attackName;
         [HideInInspector]
         public float timer;
+
+        public string attackName;
         [Header("Attack Attributes")]
         public KeyCode keyTrigger;
         public string targetTag;
         public float attackCooldown;
         public bool fireOnTheMove;
         public bool selfDestructOnAttack;
-
 
         [Header("Range Attributes")]
         public float range;
@@ -64,28 +85,34 @@ public class UnitBase : MonoBehaviour {
 
     [System.Serializable]
     public struct UnitAbilities {
+        [HideInInspector]
+        public float timer;
 
         public string abilityName;
 
         [Header("Ability Attribute")]
-        public AbilityType abilityClass;
+        //public AbilityType abilityClass;
         public KeyCode keyTrigger;
-        public float affectTimer;
+        public float abilityTimer;
 
         [Header("Stats Attribute")]
-        public StatsAffectType affectType;
+        public UnitStats statModifier;
 
-        [Header("Environment Attribute")]
-        public float affectedTimeScale;
+        //[Header("Environment Attribute")]
+        //public float affectedTimeScale;
+
+        [Header("Debug")]
+        public bool disableAbility;
     }
 
     [Header("Unit Attribute")]
     public new string name;
     public float health;
-    public bool bossStatus;
+
+    [Header("Unit Stats")]
+    public List<UnitStats> unitStat = new List<UnitStats>();
 
     void Awake() {
-
     }
 
     public float FireWeapon(UnitAttacks weapInst, Transform target) {
@@ -96,11 +123,23 @@ public class UnitBase : MonoBehaviour {
                     if (weapInst.selfDestructOnAttack)
                         Destroy(gameObject);
                     else {
-                        weapInst.timer = Time.time + weapInst.attackCooldown;
+                        weapInst.timer = Time.time + (weapInst.attackCooldown * StatCompiler(3));
                     }
                 }
         }
         return weapInst.timer;
+    }
+
+    public float UseAbility(UnitAbilities abilityInst) {
+        if (!abilityInst.disableAbility)
+            if (abilityInst.timer < Time.time) {
+                abilityInst.timer = Time.time + (abilityInst.abilityTimer * StatCompiler(3));
+                UnitStats temp = abilityInst.statModifier;
+                temp.lifetime += Time.time;
+                unitStat.Add(temp);
+            }
+
+        return abilityInst.timer;
     }
 
     public void ProjectileTypeSorting(UnitAttacks reference, Transform target) {
@@ -129,6 +168,7 @@ public class UnitBase : MonoBehaviour {
                         for (var i = -5; i < 5; i++) { //This needs a fix
                             //Debug.DrawRay(transform.position + (normDist + (new Vector3(reference.arc, 0, reference.arc) * i)) * reference.range, new Vector3(0, 10, 0), Color.red, 2);
                             inst = (Projectile)Instantiate(reference.attack, unitPos, Quaternion.identity);
+                            inst.damage *= StatCompiler(0);
                             inst.normDirection = (normDist + (new Vector3(reference.arc, 0, reference.arc) * i));
                             InitialisingProjectile(inst, target, reference.targetTag);
                         }
@@ -137,6 +177,7 @@ public class UnitBase : MonoBehaviour {
                         for (var i = 1; i < reference.amountToSpawn + 1; i++) {
                             //Debug.DrawRay(transform.position + ((normDist * reference.range * i) / reference.amountToSpawn), new Vector3(0, 10, 0), Color.red, 2);
                             inst = (Projectile)Instantiate(reference.attack, unitPos, Quaternion.identity);
+                            inst.damage *= StatCompiler(0);
                             inst.normDirection = (normDist * i) / reference.amountToSpawn;
                             InitialisingProjectile(inst, target, reference.targetTag);
                         }
@@ -152,6 +193,7 @@ public class UnitBase : MonoBehaviour {
                         reference.setY = Random.Range(reference.minForRandomY, reference.setY);
 
                     inst = (Projectile)Instantiate(reference.attack, new Vector3(Random.Range(transform.position.x - reference.range / 2, transform.position.x + reference.range / 2), reference.setY, Random.Range(transform.position.z - reference.range / 2, transform.position.z + reference.range / 2)), Quaternion.identity);
+                    inst.damage *= StatCompiler(0);
                     inst.normDirection = Vector3.Normalize(targetPos - inst.transform.position);
                     InitialisingProjectile(inst, target, reference.targetTag);
                 }
@@ -164,5 +206,37 @@ public class UnitBase : MonoBehaviour {
         inst.target = firstTar;
         inst.spawner = transform;
         inst.affectsTag = targetTag;
+    }
+
+    public void DamageUnit(float damage) {
+        damage -= StatCompiler(1);
+        health -= damage;
+
+        if (health <= 0)
+            Destroy(gameObject);
+    }
+
+    public float StatCompiler(int stat) {
+        float temp = 0;
+        for (var i = 0; i < unitStat.Count; i++) {
+            if (!unitStat[i].timed || Time.time < unitStat[i].lifetime) {
+                switch (unitStat[i].valueModifierType) {
+                    case ModifierValueType.Value:
+                        temp += unitStat[i].stats[stat].statValue;
+                        break;
+                    case ModifierValueType.Percentage:
+                        temp *= unitStat[i].stats[stat].statValue;
+                        break;
+                }
+
+                if (temp <= 0 && !unitStat[0].stats[0].negativeAllowed) {
+                    temp = 0;
+                    return temp;
+                }
+            } else {
+                unitStat.Remove(unitStat[i]);
+            }
+        }
+        return temp;
     }
 }

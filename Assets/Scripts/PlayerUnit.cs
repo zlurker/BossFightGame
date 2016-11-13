@@ -13,7 +13,6 @@ public class PlayerUnit : UnitBase {
 
     public int currentWeapSelected;
 
-
     #region Movement
     Vector3 destination;
     Vector3 normalizedDist;
@@ -27,7 +26,6 @@ public class PlayerUnit : UnitBase {
         initialY = transform.position.y;
     }
 
-    // Update is called once per frame
     void Update() {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -40,11 +38,41 @@ public class PlayerUnit : UnitBase {
             }
         }
 
+        if (!target)
+            HuntForTarget();
+
+        playerMoveSpeed = StatCompiler(2);
+
         if ((destination - transform.position).sqrMagnitude >= playerMoveSpeed * playerMoveSpeed) {
             transform.position += normalizedDist * playerMoveSpeed;
-            if (playerWeapons[currentWeapSelected].fireOnTheMove)
-                playerWeapons[currentWeapSelected].timer = FireWeapon(playerWeapons[currentWeapSelected],target);
+            if (target)
+                if (playerWeapons[currentWeapSelected].fireOnTheMove)
+                    playerWeapons[currentWeapSelected].timer = FireWeapon(playerWeapons[currentWeapSelected], target);
         } else
+            if (target)
             playerWeapons[currentWeapSelected].timer = FireWeapon(playerWeapons[currentWeapSelected], target);
-    }    
+
+        if (target)
+            if ((target.position - transform.position).sqrMagnitude > playerWeapons[currentWeapSelected].range * playerWeapons[currentWeapSelected].range || playerWeapons[currentWeapSelected].rangeType == RangeType.Normal)
+                target = null;
+
+        for (var i = 0; i < playerAbilities.Length; i++) {
+            playerAbilities[i].timer = UseAbility(playerAbilities[i]);
+        }
+    }
+
+    void HuntForTarget() {
+        float dist = Mathf.Infinity;
+        Collider temp = null;
+        Collider[] targets = Physics.OverlapSphere(transform.position, playerWeapons[currentWeapSelected].range);
+        foreach (Collider tar in targets)
+            if (tar.CompareTag(playerWeapons[currentWeapSelected].targetTag)) {
+                if ((tar.transform.position - transform.position).sqrMagnitude < dist) {
+                    dist = (tar.transform.position - transform.position).sqrMagnitude;
+                    temp = tar;
+                }
+            }
+        if (temp != null)
+            target = temp.transform;
+    }
 }
