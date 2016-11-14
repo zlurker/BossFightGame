@@ -3,6 +3,10 @@ using System.Collections;
 
 public class PlayerUnit : UnitBase {
 
+    public enum InputType {
+        TapToMove, KeyDown
+    }
+
     public float playerMoveSpeed;
     public Transform target;
 
@@ -10,13 +14,24 @@ public class PlayerUnit : UnitBase {
     public UnitAttacks[] playerWeapons;
     [Header("Player Abilities")]
     public UnitAbilities[] playerAbilities;
+    [Header("Input Type")]
+    public bool engageMode;
+    public InputType inputType;
+
+    [Header("KeyDown Input Settings")]
+    public string horizontalMovement;
+    public string verticalMovement;
+    public string rotatePlayer;
+    public string fireGun;
+    public string switchWeap;
+
+    [Header("Camera Settings")]
+    public bool firstPerson;
+    public Transform test;
 
     public int currentWeapSelected;
 
     #region Movement
-    Vector3 destination;
-    Vector3 normalizedDist;
-    float initialY;
     Ray ray;
     RaycastHit hit;
     #endregion
@@ -24,37 +39,58 @@ public class PlayerUnit : UnitBase {
     void Start() {
         destination = transform.position;
         initialY = transform.position.y;
+        //engageMode = false;
     }
 
     void Update() {
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out hit)) {
-            if (Input.GetMouseButtonDown(0)) {
-                destination = hit.point;
-                destination.y = initialY;
-                normalizedDist = Vector3.Normalize(destination - transform.position);
-                Debug.DrawLine(ray.origin, hit.point, Color.red);
-            }
-        }
-
-        if (!target)
-            HuntForTarget();
-
         playerMoveSpeed = StatCompiler(2);
 
-        if ((destination - transform.position).sqrMagnitude >= playerMoveSpeed * playerMoveSpeed) {
-            transform.position += normalizedDist * playerMoveSpeed;
-            if (target)
-                if (playerWeapons[currentWeapSelected].fireOnTheMove)
-                    playerWeapons[currentWeapSelected].timer = FireWeapon(playerWeapons[currentWeapSelected], target);
-        } else
-            if (target)
-            playerWeapons[currentWeapSelected].timer = FireWeapon(playerWeapons[currentWeapSelected], target);
+        switch (inputType) {
+            case InputType.TapToMove:
+                ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-        if (target)
-            if ((target.position - transform.position).sqrMagnitude > playerWeapons[currentWeapSelected].range * playerWeapons[currentWeapSelected].range || playerWeapons[currentWeapSelected].rangeType == RangeType.Normal)
-                target = null;
+                if (Physics.Raycast(ray, out hit))
+                    if (Input.GetMouseButtonDown(0)) {
+                        destination = hit.point;
+                        destination.y = initialY;
+                        normalizedDist = Vector3.Normalize(destination - transform.position);
+                        //Debug.DrawLine(ray.origin, hit.point, Color.red);
+                    }
+
+
+                if ((destination - transform.position).sqrMagnitude >= playerMoveSpeed * playerMoveSpeed)
+                    transform.position += normalizedDist * playerMoveSpeed;
+
+                break;
+
+            case InputType.KeyDown:
+                transform.position += transform.TransformDirection(playerMoveSpeed * Input.GetAxis(horizontalMovement), 0, playerMoveSpeed * Input.GetAxis(verticalMovement));
+
+
+                if (Input.GetButton(fireGun)) 
+                    engageMode = engageMode ? false : true;
+                    Debug.Log(engageMode);
+
+
+                if (firstPerson)
+                    if (target && engageMode) {
+                        transform.LookAt(target);
+                        test.LookAt(target);
+                    }
+                //Debug.Log(Input.GetAxis(horizontalMovement));
+                break;
+        }
+
+        if (engageMode) {
+            if (!target)
+                HuntForTarget();
+
+            if (target) {
+                playerWeapons[currentWeapSelected].timer = FireWeapon(playerWeapons[currentWeapSelected], target);
+                if ((target.position - transform.position).sqrMagnitude > playerWeapons[currentWeapSelected].range * playerWeapons[currentWeapSelected].range && playerWeapons[currentWeapSelected].rangeType == RangeType.Normal)
+                    target = null;
+            }
+       }
 
         for (var i = 0; i < playerAbilities.Length; i++) {
             playerAbilities[i].timer = UseAbility(playerAbilities[i]);

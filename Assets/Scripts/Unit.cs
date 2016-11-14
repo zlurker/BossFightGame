@@ -18,11 +18,21 @@ public class Unit : UnitBase {
     public UnitAttacks[] attacks;
     public UnitAbilities[] abilities;
 
+    float unitMoveSpeed;
+
     void Start() {
 
     }
 
     void Update() {
+        transform.LookAt(target);
+        normalizedDist = Vector3.Normalize(target.position - transform.position);
+
+        unitMoveSpeed = StatCompiler(2);
+
+        if ((target.position - transform.position).sqrMagnitude >= unitMoveSpeed * unitMoveSpeed)
+            transform.position += normalizedDist * unitMoveSpeed;
+
         for (var i = 0; i < attacks.Length; i++) {
             Transform tempTarget = null;
 

@@ -54,7 +54,7 @@ public class UnitBase : MonoBehaviour {
         public KeyCode keyTrigger;
         public string targetTag;
         public float attackCooldown;
-        public bool fireOnTheMove;
+        //public bool fireOnTheMove;
         public bool selfDestructOnAttack;
 
         [Header("Range Attributes")]
@@ -73,11 +73,12 @@ public class UnitBase : MonoBehaviour {
         [Header("Global Random Locations Attribute")]
         public bool overrideTargetAsThis;
 
-        [Header("Y Attributes")]
-        public bool useUnitY;
+        [Header("Y Attributes")]       
         public float setY;
         public float minForRandomY;
+        public bool useUnitY;
         public bool randomY;
+        public bool ignoreY;
 
         [Header("Debug")]
         public bool disableAttack;
@@ -111,6 +112,12 @@ public class UnitBase : MonoBehaviour {
 
     [Header("Unit Stats")]
     public List<UnitStats> unitStat = new List<UnitStats>();
+
+    #region Movement
+    protected Vector3 destination;
+    protected Vector3 normalizedDist;
+    protected float initialY;
+    #endregion
 
     void Awake() {
     }
@@ -159,8 +166,12 @@ public class UnitBase : MonoBehaviour {
                 if (reference.randomY)
                     reference.setY = Random.Range(reference.minForRandomY, reference.setY);
 
-
                 unitPos = new Vector3(transform.position.x, reference.setY, transform.position.z);
+
+                if (reference.ignoreY) 
+                    targetPos.y = reference.setY;
+                
+
                 normDist = Vector3.Normalize(targetPos - unitPos);
 
                 switch (reference.typeOfFrontAttack) {

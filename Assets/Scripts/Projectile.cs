@@ -16,6 +16,7 @@ public class Projectile : MonoBehaviour {
     public float projectileSpeed;
     public bool timeBasedProjectile;
     public float lifetime;
+    public bool lookAtTarget;
     public bool piercing;
     public bool healing;
 
@@ -55,11 +56,20 @@ public class Projectile : MonoBehaviour {
     }
 
     void Update() {
+        if (rotation != Vector3.zero)
+            transform.eulerAngles += rotation;
+
+        if (expand != Vector3.zero)
+            transform.localScale += expand;
+
+        if (lookAtTarget)
+            transform.LookAt(target);
+
         if (!contact || !stops) {
             if (bulletPattern == BulletPattern.Seeking)
                 if (targetUpdateTimer < Time.time) {
                     targetUpdateTimer = Time.time + rateOfTargetUpdate;
-                    normDirection = Vector3.Normalize(target.position - transform.position);
+                    normDirection = Vector3.Normalize(target.position - transform.position);                   
                 }
 
             switch (bulletPattern) {
@@ -78,11 +88,6 @@ public class Projectile : MonoBehaviour {
             }
         }
 
-        if (rotation != Vector3.zero)
-            transform.eulerAngles += rotation;
-
-        if (expand != Vector3.zero)
-            transform.localScale += expand;
 
         if (warnPlayer) { //Show marking.
 

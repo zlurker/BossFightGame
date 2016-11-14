@@ -45,6 +45,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\ImportedAssets\OVR\OVRImageEffects\OVRImageEffectBase.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\OVRImageEffects\OVRLensCorrection.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRCamera.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRCameraController.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRComponent.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRCrosshair.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRDevice.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRGUI.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRGamepadController.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRMagCalibration.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRMainMenu.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRMessenger.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRPlayerController.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRPresetManager.cs" />
+     <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRUtils.cs" />
+     <Compile Include="Assets\Scripts\ExperimentalScripts\CollisionTester.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\ListExperimentScript.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\NormalizeTest.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\ObjectPullingExperiment.cs" />
@@ -57,7 +73,10 @@
      <None Include="Assets\ImportedAssets\Simple Sky\ReadMe.txt" />
      <None Include="Assets\ImportedAssets\Simple Military\ReadMe.txt" />
      <None Include="Assets\ImportedAssets\Simple Military\Materials\UnlitVertexColour_Alpha.shader" />
+     <None Include="Assets\ImportedAssets\OVR\OVRImageEffects\OVRLensCorrection_CA.shader" />
      <None Include="Assets\ImportedAssets\Credits.txt" />
+     <None Include="Assets\ImportedAssets\OVR\OVRImageEffects\OVRLensCorrection.shader" />
+     <None Include="Assets\ImportedAssets\OVR\Shaders\OVRGUIShader.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity 5.4.1/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

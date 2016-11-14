@@ -1,5 +1,4 @@
 sceneSetups:
-- path: Assets/ImportedAssets/Simple Military/Scenes/Simple Military First Person
-    Hands.unity
+- path: Assets/Scenes/GameScene.unity
   isLoaded: 1
   isActive: 1
