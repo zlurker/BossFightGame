@@ -23,11 +23,11 @@ public class PlayerUnit : UnitBase {
     public string verticalMovement;
     public string rotatePlayer;
     public string fireGun;
-    public string switchWeap;
+    public string switchWeapF;
+    public string switchWeapB;
 
     [Header("Camera Settings")]
     public bool firstPerson;
-    public Transform test;
 
     public int currentWeapSelected;
 
@@ -65,19 +65,21 @@ public class PlayerUnit : UnitBase {
 
             case InputType.KeyDown:
                 transform.position += transform.TransformDirection(playerMoveSpeed * Input.GetAxis(horizontalMovement), 0, playerMoveSpeed * Input.GetAxis(verticalMovement));
+                transform.position = new Vector3(transform.position.x, initialY, transform.position.z);
 
 
-                if (Input.GetButton(fireGun)) 
+                if (Input.GetButtonDown(fireGun))
                     engageMode = engageMode ? false : true;
-                    Debug.Log(engageMode);
 
+                if (Input.GetButtonDown(switchWeapF))
+                    CycleWeapon(1);
+                if (Input.GetButtonDown(switchWeapB))
+                    CycleWeapon(-1);
 
                 if (firstPerson)
                     if (target && engageMode) {
                         transform.LookAt(target);
-                        test.LookAt(target);
                     }
-                //Debug.Log(Input.GetAxis(horizontalMovement));
                 break;
         }
 
@@ -90,11 +92,12 @@ public class PlayerUnit : UnitBase {
                 if ((target.position - transform.position).sqrMagnitude > playerWeapons[currentWeapSelected].range * playerWeapons[currentWeapSelected].range && playerWeapons[currentWeapSelected].rangeType == RangeType.Normal)
                     target = null;
             }
-       }
+        }
 
         for (var i = 0; i < playerAbilities.Length; i++) {
             playerAbilities[i].timer = UseAbility(playerAbilities[i]);
         }
+        Debug.Log(playerWeapons[currentWeapSelected].attackName);
     }
 
     void HuntForTarget() {
@@ -110,5 +113,15 @@ public class PlayerUnit : UnitBase {
             }
         if (temp != null)
             target = temp.transform;
+    }
+
+    void CycleWeapon(int value) {
+        currentWeapSelected += value;
+
+        if (currentWeapSelected < 0)
+            currentWeapSelected = playerWeapons.Length - 1;
+
+        if (currentWeapSelected >= playerWeapons.Length)
+            currentWeapSelected = 0;
     }
 }

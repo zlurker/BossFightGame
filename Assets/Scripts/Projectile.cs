@@ -98,7 +98,7 @@ public class Projectile : MonoBehaviour {
                 ProjectileExpired();
     }
 
-    void OnCollisionEnter(Collision collision) {
+    void OnTriggerEnter(Collider collision) {
         UnitBase inst = null;
         UnitBase.UnitStats temp;
         if (collision.transform.CompareTag(affectsTag) || collision.transform.CompareTag("Floor")) {

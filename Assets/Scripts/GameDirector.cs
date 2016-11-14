@@ -9,12 +9,17 @@ public class GameDirector : MonoBehaviour {
     public int currentBoss;
 
     public Unit boss;
-    public GameObject player;
+    public PlayerUnit player;
 
     public Text bossName;
     public Text bossHP;
+    public float bossSpawnPeriod;
 
+    float nextBossSpawnTime;
     float initialBossHealth;
+    Vector3 initialPlayerPos;
+    Vector3 initialPlayerRot;
+
     void Start() {
         instance = this;
 
@@ -23,6 +28,9 @@ public class GameDirector : MonoBehaviour {
             initialBossHealth = boss.health;
             bossName.text = boss.name;
         }
+
+        initialPlayerPos = player.transform.position;
+        initialPlayerRot = player.transform.eulerAngles;
     }
 
     void Update() {
@@ -31,7 +39,18 @@ public class GameDirector : MonoBehaviour {
             boss.target = player.transform;
             initialBossHealth = boss.health;
             bossName.text = boss.name;
+            boss.enabled = false;
+            nextBossSpawnTime = Time.time + bossSpawnPeriod;
+            boss.gameObject.tag = "Untagged";
+
+            player.transform.position = initialPlayerPos;
+            player.transform.eulerAngles = initialPlayerRot;
             currentBoss++;
+        }
+
+        if (!boss.isActiveAndEnabled && nextBossSpawnTime < Time.time) {
+            boss.enabled = true;
+            boss.gameObject.tag = "Enemy";
         }
 
         if (boss)

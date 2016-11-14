@@ -60,6 +60,7 @@
      <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRPlayerController.cs" />
      <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRPresetManager.cs" />
      <Compile Include="Assets\ImportedAssets\OVR\Scripts\OVRUtils.cs" />
+     <Compile Include="Assets\MenuScript.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\CollisionTester.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\ListExperimentScript.cs" />
      <Compile Include="Assets\Scripts\ExperimentalScripts\NormalizeTest.cs" />
